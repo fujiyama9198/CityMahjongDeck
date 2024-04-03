@@ -119,6 +119,9 @@ _characters_src = [
 ]
 
 
+character_codes = {c:i for i, (c, _) in enumerate(_characters_src)}
+characters_by_codes = list(character_codes.keys())
+
 # All character cards with duplicates
 characters = []
 for c, n in _characters_src:
@@ -127,22 +130,23 @@ assert len(characters) == 136
 character_set = set(characters)
 
 
-with open(pathlib.Path(__file__).parent / "list.csv", "r") as f:
-    all_city_names = [n[2] for n in csv.reader(f) if n[2][-1] in {"市", "町", "村"}]
-
 # All city/town/village names (including "impossible" names with the character set)
-all_city_names = [n[:-1] for n in all_city_names]
+with open(pathlib.Path(__file__).parent / "list.csv", "r") as f:
+    all_city_names_with_prefecture = [(n[2][:-1], n[0], n[2]) for n in csv.reader(f) if n[2][-1] in {"市", "町", "村"}]
+    all_city_names = [n for n, _, _ in all_city_names_with_prefecture]
 
 # All possible city/town/village names (including duplicates like "横浜(市)" and "横浜(町)")
 possible_names = []
+possible_names_with_prefecture = []
 
 # Dictionary of lists of possible names for each character
 character_candidates = {}
-for name in all_city_names:
+for name, prefecture, fullname in all_city_names_with_prefecture:
     if all((c in character_set) for c in name):
         possible_names.append(name)
+        possible_names_with_prefecture.append((name, prefecture, fullname))
         for c in name:
-            character_candidates.setdefault(c, []).append(name)
+            character_candidates.setdefault(c, []).append((name, fullname))
 
 # All character cards with its possible city/town/village names
 character_numbers = [(c, len(character_candidates[c])) for c in characters]
