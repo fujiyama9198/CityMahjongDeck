@@ -71,7 +71,6 @@ def add_city_to_tree(cityname: str, prefecture:str, fullname:str, root: Optional
         for next_ch, next_node in node.dst:
             if next_node.failure is None:
                 next_node.failure = _get_failure(node, root, next_ch)
-        for next_ch, next_node in node.dst:
             _build_failure(next_node, root)
     
     def _enumerate_idx(node:CityNameTrieNode, idx:int):
